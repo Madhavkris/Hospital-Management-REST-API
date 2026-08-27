@@ -8,3 +8,5 @@ class Patient(db.Model):
     gender = db.Column(db.String(20), nullable=False)
     age = db.Column(db.Integer, nullable=False)
     disease = db.Column(db.String(100), nullable=False)
+#relationship()
+    appointments=db.relationship("Appointment",back_populates="patient")

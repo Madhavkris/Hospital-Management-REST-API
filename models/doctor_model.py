@@ -6,3 +6,7 @@ class Doctor(db.Model):
     doctor_name=db.Column(db.String(100),nullable=False)
     specialization=db.Column(db.String(100),nullable=False)
     department_id=db.Column(db.Integer,db.ForeignKey("departments.department_id"),nullable=False)
+
+    #relationship()
+    department=db.relationship("Department",back_populates="doctors")
+    appointments=db.relationship("Appointment",back_populates="doctor")

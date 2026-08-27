@@ -1,6 +1,6 @@
 from database.connection import db
 
-class Appointments(db.Model):
+class Appointment(db.Model):
     __tablename__='appointments'
     appointment_id=db.Column(db.Integer,primary_key=True)
     patient_id=db.Column(db.Integer,db.ForeignKey("patients.patient_id"),nullable=False)
@@ -8,3 +8,6 @@ class Appointments(db.Model):
     appointment_date=db.Column(db.Date,nullable=False)
     appointment_time=db.Column(db.Time,nullable=False)
     status=db.Column(db.String(20),nullable=False,default="Booked")
+#relationship()
+    patient = db.relationship("Patient", back_populates="appointments")
+    doctor=db.relationship("Doctor", back_populates="appointments")
