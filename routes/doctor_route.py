@@ -1,9 +1,49 @@
-from flask import Blueprint,jsonify
-from services.doctor_service import get_all_doctors
+from flask import Blueprint,jsonify,request
+from services.doctor_service import get_all_doctors,get_doctor_by_id,create_doctor
 doctor_bp=Blueprint('doctor',__name__,url_prefix='/api/doctors')
 @doctor_bp.route('/',methods=['GET'])
 def get_doctors():
     doctors=get_all_doctors()
     if doctors is None:
         return jsonify({"error":"Database error"}),500
-    return jsonify(doctors),200
+    result=[]
+    for doctor in doctors:
+        result.append({
+            "doctor_id":doctor.doctor_id,
+            "doctor_name":doctor.doctor_name,
+            "specialization":doctor.specialization,
+            "department":doctor.department.department_name
+        })
+    return jsonify(result),200
+
+@doctor_bp.route('/<int:doctor_id>',methods=['GET'])
+def get_doctor_with_id(doctor_id):
+    doctor=get_doctor_by_id(doctor_id)
+    if doctor is None:
+        return jsonify({"error":"Doctor not found"}),404
+    return jsonify({
+        "doctor_id": doctor.doctor_id,
+        "doctor_name": doctor.doctor_name,
+        "specialization": doctor.specialization,
+        "department": doctor.department.department_name
+    }),200
+
+@doctor_bp.route('/',methods=['POST'])
+def add_doctor():
+    new_doctor=request.get_json()
+    if new_doctor is None:
+        return jsonify({"error":"Doctor is not added"}),400
+    created_doctor=create_doctor(
+        doctor_name=new_doctor.get("doctor_name"),
+        specialization=new_doctor.get("specialization"),
+        department_id=new_doctor.get("department_id")
+    )
+    if created_doctor is None:
+        return jsonify({"error":"Doctor is not created"}),400
+    return jsonify({
+        "status":"Doctor is added successfully",
+        "doctor_id": created_doctor.doctor_id,
+        "specialization": created_doctor.specialization,
+        "department_id": created_doctor.department.department_id
+
+    }),201
