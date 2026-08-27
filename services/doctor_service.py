@@ -1,21 +1,21 @@
-from database.connection import get_connect
+from database.connection import db
+from models.doctor_model import Doctor
 def get_all_doctors():
-    connection = get_connect()
-    if not connection:
+    return db.session.execute(db.select(Doctor)).scalars().all()
+def get_doctor_by_id(doctor_id):
+    doctor=db.session.get(Doctor,doctor_id)
+    return doctor
+def create_doctor(doctor_name,specialization,department_id):
+    try:
+        new_doctor=Doctor(
+            doctor_name=doctor_name,
+            specialization=specialization,
+            department_id=department_id
+        )
+        db.session.add(new_doctor)
+        db.session.commit()
+        return new_doctor
+    except Exception as e:
+        db.session.rollback()
+        print(e)
         return None
-    cursor = connection.cursor(dictionary=True)
-    query = """
-        SELECT
-            d.doctor_id,
-            d.doctor_name,
-            d.specialization,
-            dep.department_name
-        FROM doctors d
-        JOIN departments dep
-            ON d.department_id = dep.department_id
-    """
-    cursor.execute(query)
-    doctors = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return doctors

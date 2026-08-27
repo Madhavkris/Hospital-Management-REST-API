@@ -1,11 +1,21 @@
-from database.connection import get_connect
+from database.connection import db
+from models.department_model import Department
+def get_department_by_id(department_id):
+    department=db.session.get(Department,department_id)
+    return department
 def get_all_departments():
-    connection=get_connect()
-    if not connection:
+    return db.session.execute(db.select(Department)).scalars().all()
+
+#
+def create_department(department_name):
+    try:
+        new_department = Department(
+         department_name = department_name
+        )
+        db.session.add(new_department)
+        db.session.commit()
+        return new_department
+    except Exception as e:
+        db.session.rollback()
+        print(e)
         return None
-    cursor=connection.cursor(dictionary=True)
-    cursor.execute("select * from departments")
-    results=cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return results
