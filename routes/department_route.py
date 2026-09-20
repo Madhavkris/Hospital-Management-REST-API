@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify,request
-from services.department_service import get_all_departments,get_department_by_id,create_department
+from services.department_service import get_all_departments,get_department_by_id,create_department,update_department
 department_bp=Blueprint('department',__name__,url_prefix='/api/departments')
 @department_bp.route('/',methods=['GET'])
 def get_departments():
@@ -37,3 +37,18 @@ def add_department():
         "status":"Department created",
         "department_name":created_department.department_name,}),201
 
+
+#update
+@department_bp.route('/<int:department_id>',methods=['PUT'])
+def edit_department(department_id):
+    department=request.get_json()
+    if not department:
+        return jsonify({"Error":"Request body is required"}),400
+    update_department_name=department.get('department_name')
+    updated_department=update_department(
+        department_id=department_id,
+        department_name=update_department_name
+    )
+    if not updated_department:
+        return jsonify({"Error":"Department not found"}),400
+    return jsonify({"status":"Department updated successfully"}),200
