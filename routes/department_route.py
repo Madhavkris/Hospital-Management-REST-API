@@ -50,5 +50,5 @@ def edit_department(department_id):
         department_name=update_department_name
     )
     if not updated_department:
-        return jsonify({"Error":"Department not found"}),400
+        return jsonify({"Error":"Department not found"}),404
     return jsonify({"status":"Department updated successfully"}),200

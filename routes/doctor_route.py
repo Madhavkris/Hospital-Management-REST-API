@@ -63,7 +63,7 @@ def remove_doctor(doctor_id):
 def edit_doctor(doctor_id):
     doctor=request.get_json()
     if doctor is None:
-        return jsonify({"error":"Doctor not found"}),404
+        return jsonify({"error":"Request body is required"}),400
     updated_doctor_name=doctor.get('doctor_name')
     updated_specialization=doctor.get('specialization')
     updated_department=doctor.get("department_id")

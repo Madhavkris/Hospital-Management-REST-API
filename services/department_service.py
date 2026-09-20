@@ -30,5 +30,6 @@ def update_department(department_id, department_name):
         db.session.commit()
         return department
     except Exception as e:
+        db.session.rollback()
         print(repr(e))
         return None
