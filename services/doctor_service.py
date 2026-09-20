@@ -40,6 +40,7 @@ def update_doctor(doctor_id,doctor_name,specialization,department_id):
             return None
         doctor.doctor_name=doctor_name
         doctor.specialization=specialization
+        doctor.department_id=department_id
         db.session.commit()
         return doctor
     except Exception as e:
