@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify,request
-from services.doctor_service import get_all_doctors,get_doctor_by_id,create_doctor
+from services.doctor_service import get_all_doctors,get_doctor_by_id,create_doctor,delete_doctor,update_doctor
 doctor_bp=Blueprint('doctor',__name__,url_prefix='/api/doctors')
 @doctor_bp.route('/',methods=['GET'])
 def get_doctors():
@@ -47,3 +47,32 @@ def add_doctor():
         "department_id": created_doctor.department.department_id
 
     }),201
+
+@doctor_bp.route('/<int:doctor_id>',methods=['DELETE'])
+def remove_doctor(doctor_id):
+    doctor=get_doctor_by_id(doctor_id)
+    if doctor is None:
+        return jsonify({"error":"Doctor not found"}),404
+    target=doctor.doctor_id
+    deleted_doctor=delete_doctor(doctor_id)
+    if not deleted_doctor:
+        return jsonify({"error":"Doctor not deleted"}),400
+    return jsonify({"status":"Doctor removed successfully","doctor_id":target}),200
+
+@doctor_bp.route('/<int:doctor_id>',methods=['PUT'])
+def edit_doctor(doctor_id):
+    doctor=request.get_json()
+    if doctor is None:
+        return jsonify({"error":"Doctor not found"}),404
+    updated_doctor_name=doctor.get('doctor_name')
+    updated_specialization=doctor.get('specialization')
+    updated_department=doctor.get("department_id")
+    updated=update_doctor(
+        doctor_id=doctor_id,
+        doctor_name=updated_doctor_name,
+        specialization=updated_specialization,
+        department_id=updated_department
+    )
+    if updated is None:
+        return jsonify({"error":"Doctor not updated"}),400
+    return jsonify({"status":"Doctor updated successfully"}),200

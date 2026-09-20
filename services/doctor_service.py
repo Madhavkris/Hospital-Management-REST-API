@@ -19,3 +19,29 @@ def create_doctor(doctor_name,specialization,department_id):
         db.session.rollback()
         print(e)
         return None
+
+def delete_doctor(doctor_id):
+    try:
+       doctor=get_doctor_by_id(doctor_id)
+       if doctor is None:
+           return None
+       db.session.delete(doctor)
+       db.session.commit()
+       return doctor
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return None
+
+def update_doctor(doctor_id,doctor_name,specialization,department_id):
+    try:
+        doctor=get_doctor_by_id(doctor_id)
+        if doctor is None:
+            return None
+        doctor.doctor_name=doctor_name
+        doctor.specialization=specialization
+        db.session.commit()
+        return doctor
+    except Exception as e:
+        print(repr(e))
+        return None
