@@ -1,7 +1,8 @@
 from flask import Blueprint,jsonify,request
-from services.appointment_service import get_appointment_by_id,get_all_appointments,create_appointments
+from services.appointment_service import get_appointment_by_id,get_all_appointments,create_appointments,delete_appointment,update_appointments
 
 appointment_bp=Blueprint('appointment',__name__,url_prefix="/api/appointments")
+#READ ALL/GET ALL
 @appointment_bp.route('/',methods=['GET'])
 def all_appointments():
         appointments=get_all_appointments()
@@ -23,7 +24,7 @@ def all_appointments():
         return jsonify(result),200
 
 
-
+#Read BY ID/GET BY ID
 @appointment_bp.route('/<int:appointment_id>',methods=['GET'])
 def get_appointment(appointment_id):
     try:
@@ -44,7 +45,7 @@ def get_appointment(appointment_id):
         print(e)
         return jsonify({'error':str(e)}),500
 
-
+#Create
 @appointment_bp.route('/',methods=['POST'])
 def add_appointment():
     new_appointment=request.get_json()
@@ -61,3 +62,37 @@ def add_appointment():
         return jsonify({"error":"Appointment is not created"}),400
     return jsonify({"message":"Appointment created successfully",
                     "appointment_id":created_appointment.appointment_id}),201
+#delete
+@appointment_bp.route('/<int:appointment_id>',methods=['DELETE'])
+def remove_appointment(appointment_id):
+    appointment=get_appointment_by_id(appointment_id)
+    if not appointment:
+        return jsonify({"error":"Appointment is not found"}),400
+    deleted_appointment=delete_appointment(appointment_id)
+    if not deleted_appointment:
+        return jsonify({"error":"Appointment is not deleted"}),400
+    return jsonify({"message":"Appointment deleted successfully","appointment ID":deleted_appointment.appointment_id}),200
+
+#UPDATE
+@appointment_bp.route('/<int:appointment_id>',methods=['PUT'])
+def edit_appointments(appointment_id):
+    appointment=request.get_json()
+    if not appointment:
+        return jsonify({"Error":"Request Body is required"}),400
+    doctor_id = appointment.get('doctor_id')
+    patient_id = appointment.get('patient_id')
+    update_appointment_time=appointment.get('appointment_time')
+    update_appointment_date=appointment.get('appointment_date')
+    update_appointment_status=appointment.get('status')
+
+    updated_appointment=update_appointments(
+        appointment_id=appointment_id,
+        doctor_id=doctor_id,
+        patient_id=patient_id,
+        appointment_time=update_appointment_time,
+        appointment_date=update_appointment_date,
+        status=update_appointment_status
+    )
+    if not updated_appointment:
+        return jsonify({"error":"Appointment is not updated"}),404
+    return jsonify({"status":"Appointment is updated"}),200

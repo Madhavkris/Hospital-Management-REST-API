@@ -24,5 +24,32 @@ def create_appointments(patient_id,doctor_id,appointment_date,appointment_time,s
      return new_appointment
    except Exception as e:
        db.session.rollback()
-       print(e)
+       print("Appointment Error:",repr(e))
        return None
+def delete_appointment(appointment_id):
+    try:
+       appointment = get_appointment_by_id(appointment_id)
+       db.session.delete(appointment)
+       db.session.commit()
+       return appointment
+    except Exception as e:
+        db.session.rollback()
+        print("Appointment Error:",repr(e))
+        return None
+#update
+def update_appointments(appointment_id,patient_id,doctor_id,appointment_date,appointment_time,status):
+    try:
+        appointment = get_appointment_by_id(appointment_id)
+        if not appointment:
+            return None
+        appointment.patient_id=patient_id
+        appointment.doctor_id=doctor_id
+        appointment.appointment_date = appointment_date
+        appointment.appointment_time = appointment_time
+        appointment.status = status
+        db.session.commit()
+        return appointment
+    except Exception as e:
+        db.session.rollback()
+        print(repr(e))
+        return None
