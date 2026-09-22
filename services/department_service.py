@@ -33,3 +33,19 @@ def update_department(department_id, department_name):
         db.session.rollback()
         print(repr(e))
         return None
+
+#Partial Update
+def partial_update(department_id,data):
+    try:
+       department=get_department_by_id(department_id)
+       if not department:
+           return None
+       if data.get('department_name'):
+           department.department_name=data.get('department_name')
+       db.session.commit()
+       return department
+    except Exception as e:
+        db.session.rollback()
+        print(repr(e))
+        return None
+
