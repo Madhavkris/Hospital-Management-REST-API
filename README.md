@@ -245,7 +245,7 @@ Request body:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Madhavkris~~~~/Hospital-Management-REST-API.git
+git clone https://github.com/Madhavkris/Hospital-Management-REST-API.git
 ```
 
 ```bash
