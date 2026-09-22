@@ -46,3 +46,21 @@ def update_doctor(doctor_id,doctor_name,specialization,department_id):
     except Exception as e:
         print(repr(e))
         return None
+
+def partial_update(doctor_id,data):
+    try:
+        doctor=get_doctor_by_id(doctor_id)
+        if not doctor:
+            return None
+        if data.get('doctor_name'):
+            doctor.doctor_name=data.get('doctor_name')
+        if data.get('specialization'):
+            doctor.specialization=data.get('specialization')
+        if data.get('department_id'):
+            doctor.department_id=data.get('department_id')
+        db.session.commit()
+        return doctor
+    except Exception as e:
+        db.session.rollback()
+        print(repr(e))
+        return None
