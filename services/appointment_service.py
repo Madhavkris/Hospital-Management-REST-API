@@ -53,3 +53,25 @@ def update_appointments(appointment_id,patient_id,doctor_id,appointment_date,app
         db.session.rollback()
         print(repr(e))
         return None
+
+def partial_update(appointment_id,data):
+    try:
+        appointment = get_appointment_by_id(appointment_id)
+        if not appointment:
+            return None
+        if data.get('patient_id'):
+            appointment.patient_id = data.get('patient_id')
+        if data.get('doctor_id'):
+            appointment.doctor_id = data.get('doctor_id')
+        if data.get('appointment_date'):
+            appointment.appointment_date = data.get('appointment_date')
+        if data.get('appointment_time'):
+            appointment.appointment_time = data.get('appointment_time')
+        if data.get('status'):
+            appointment.status = data.get('status')
+        db.session.commit()
+        return appointment
+    except Exception as e:
+        db.session.rollback()
+        print(repr(e))
+        return None

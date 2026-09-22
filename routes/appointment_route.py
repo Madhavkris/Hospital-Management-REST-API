@@ -1,5 +1,5 @@
 from flask import Blueprint,jsonify,request
-from services.appointment_service import get_appointment_by_id,get_all_appointments,create_appointments,delete_appointment,update_appointments
+from services.appointment_service import get_appointment_by_id,get_all_appointments,create_appointments,delete_appointment,update_appointments,partial_update
 
 appointment_bp=Blueprint('appointment',__name__,url_prefix="/api/appointments")
 #READ ALL/GET ALL
@@ -96,3 +96,13 @@ def edit_appointments(appointment_id):
     if not updated_appointment:
         return jsonify({"error":"Appointment is not updated"}),404
     return jsonify({"status":"Appointment is updated"}),200
+
+@appointment_bp.route('/<int:appointment_id>',methods=['PATCH'])
+def partial_update_appointment(appointment_id):
+    data=request.get_json()
+    if not data:
+        return jsonify({"error":"Request Body is required"}),400
+    appointment=partial_update(appointment_id,data)
+    if not appointment:
+        return jsonify({"error":"Appointment is not updated"}),404
+    return jsonify({"message":"Appointment updated successfully"}),200
