@@ -49,3 +49,22 @@ def update_patient(patient_id,patient_name,age,gender,disease):
         db.session.rollback()
         print(repr(e))
         return None
+def partial_update(patient_id,data):
+    try:
+        patient=get_patient_by_id(patient_id)
+        if not patient:
+            return None
+        if data.get('patient_name'):
+            patient.patient_name=data["patient_name"]
+        if data.get('age'):
+            patient.age=data["age"]
+        if data.get('gender'):
+            patient.gender=data["gender"]
+        if data.get('disease'):
+            patient.disease=data["disease"]
+        db.session.commit()
+        return patient
+    except Exception as e:
+        db.session.rollback()
+        print(repr(e))
+        return None
