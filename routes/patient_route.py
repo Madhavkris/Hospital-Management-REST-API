@@ -89,7 +89,7 @@ def edit_patient(patient_id):
     return jsonify({"status":"Patient updated successfully","patient_id":updated_patient.patient_id}),200
 
 @patient_bp.route('/<int:patient_id>',methods=['PATCH'])
-def update_patient(patient_id):
+def partial_update_patient(patient_id):
     data=request.get_json()
     if not data:
         return jsonify({"error":"Request body is Required"}),400

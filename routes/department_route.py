@@ -54,7 +54,7 @@ def edit_department(department_id):
     return jsonify({"status":"Department updated successfully"}),200
 
 @department_bp.route("/<int:department_id>",methods=['PATCH'])
-def delete_department(department_id):
+def partial_update_department(department_id):
     data=request.get_json()
     if not data:
         return jsonify({"Error":"Request body is required"}),400
