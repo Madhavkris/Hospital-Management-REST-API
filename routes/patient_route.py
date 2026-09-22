@@ -1,4 +1,3 @@
-from urllib import request
 from flask import Blueprint,jsonify,request
 from services.patient_service import get_all_patients,get_patient_by_id,create_patient,delete_patient,update_patient,partial_update
 
@@ -85,7 +84,7 @@ def edit_patient(patient_id):
         disease=updated_disease
     )
     if not updated_patient:
-        return jsonify({"error":"Patient not updated"}),400
+        return jsonify({"error":"Patient not found"}),404
     return jsonify({"status":"Patient updated successfully","patient_id":updated_patient.patient_id}),200
 
 @patient_bp.route('/<int:patient_id>',methods=['PATCH'])

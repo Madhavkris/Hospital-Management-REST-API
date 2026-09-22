@@ -59,15 +59,15 @@ def partial_update(appointment_id,data):
         appointment = get_appointment_by_id(appointment_id)
         if not appointment:
             return None
-        if data.get('patient_id'):
+        if 'patient_id' in data:
             appointment.patient_id = data.get('patient_id')
-        if data.get('doctor_id'):
+        if 'doctor_id' in data:
             appointment.doctor_id = data.get('doctor_id')
-        if data.get('appointment_date'):
+        if 'appointment_date' in data:
             appointment.appointment_date = data.get('appointment_date')
-        if data.get('appointment_time'):
+        if 'appointment_time' in data:
             appointment.appointment_time = data.get('appointment_time')
-        if data.get('status'):
+        if 'status' in data:
             appointment.status = data.get('status')
         db.session.commit()
         return appointment

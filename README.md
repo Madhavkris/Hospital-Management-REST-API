@@ -163,42 +163,46 @@ These relationships are implemented using SQLAlchemy `relationship()` and `back_
 
 ### Patients
 
-| Method | Endpoint                     | Description       |
-| ------ | ---------------------------- | ----------------- |
-| GET    | `/api/patients/`             | Get all patients  |
-| GET    | `/api/patients/<patient_id>` | Get patient by ID |
-| POST   | `/api/patients/`             | Create patient    |
-| PUT    | `/api/patients/<patient_id>` | Update patient    |
-| DELETE | `/api/patients/<patient_id>` | Delete patient    |
+| Method | Endpoint                      | Description            |
+|--------|-------------------------------|------------------------|
+| GET    | `/api/patients/`              | Get all patients       |
+| GET    | `/api/patients/<patient_id>`  | Get patient by ID      |
+| POST   | `/api/patients/`              | Create patient         |
+| PUT    | `/api/patients/<patient_id>`  | Update patient         |
+| DELETE | `/api/patients/<patient_id>`  | Delete patient         |
+| PATCH  | `/api/patientss/<patient_id>` | Partial Update patient |
 
 ### Doctors
 
-| Method | Endpoint                   | Description      |
-| ------ | -------------------------- | ---------------- |
-| GET    | `/api/doctors/`            | Get all doctors  |
-| GET    | `/api/doctors/<doctor_id>` | Get doctor by ID |
-| POST   | `/api/doctors/`            | Create doctor    |
-| PUT    | `/api/doctors/<doctor_id>` | Update doctor    |
-| DELETE | `/api/doctors/<doctor_id>` | Delete doctor    |
+| Method | Endpoint                    | Description           |
+|--------|-----------------------------|-----------------------|
+| GET    | `/api/doctors/`             | Get all doctors       |
+| GET    | `/api/doctors/<doctor_id>`  | Get doctor by ID      |
+| POST   | `/api/doctors/`             | Create doctor         |
+| PUT    | `/api/doctors/<doctor_id>`  | Update doctor         |
+| DELETE | `/api/doctors/<doctor_id>`  | Delete doctor         |
+| PATCH  | `/api/doctors/<doctors_id>` | Partial Update doctor |
 
 ### Departments
 
-| Method | Endpoint                           | Description          |
-| ------ | ---------------------------------- | -------------------- |
-| GET    | `/api/departments/`                | Get all departments  |
-| GET    | `/api/departments/<department_id>` | Get department by ID |
-| POST   | `/api/departments/`                | Create department    |
-| PUT    | `/api/departments/<department_id>` | Update department    |
+| Method | Endpoint                           | Description              |
+|--------| ---------------------------------- |--------------------------|
+| GET    | `/api/departments/`                | Get all departments      |
+| GET    | `/api/departments/<department_id>` | Get department by ID     |
+| POST   | `/api/departments/`                | Create department        |
+| PUT    | `/api/departments/<department_id>` | Update department        |
+| PATCH  | `/api/departments/<department_id>` | PartialUpdate department |
 
 ### Appointments
 
-| Method | Endpoint                             | Description           |
-| ------ | ------------------------------------ | --------------------- |
-| GET    | `/api/appointments/`                 | Get all appointments  |
-| GET    | `/api/appointments/<appointment_id>` | Get appointment by ID |
-| POST   | `/api/appointments/`                 | Create appointment    |
-| PUT    | `/api/appointments/<appointment_id>` | Update appointment    |
-| DELETE | `/api/appointments/<appointment_id>` | Delete appointment    |
+| Method | Endpoint                             | Description                |
+|--------|--------------------------------------|----------------------------|
+| GET    | `/api/appointments/`                 | Get all appointments       |
+| GET    | `/api/appointments/<appointment_id>` | Get appointment by ID      |
+| POST   | `/api/appointments/`                 | Create appointment         |
+| PUT    | `/api/appointments/<appointment_id>` | Update appointment         |
+| DELETE | `/api/appointments/<appointment_id>` | Delete appointment         |
+| PATCH  | `/api/appointments/<appointment_id>` | Partial Update appointment |
 
 ## 📋 Example Request
 

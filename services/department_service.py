@@ -40,7 +40,7 @@ def partial_update(department_id,data):
        department=get_department_by_id(department_id)
        if not department:
            return None
-       if data.get('department_name'):
+       if 'department_name' in data:
            department.department_name=data.get('department_name')
        db.session.commit()
        return department

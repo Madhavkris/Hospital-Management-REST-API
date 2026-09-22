@@ -54,13 +54,13 @@ def partial_update(patient_id,data):
         patient=get_patient_by_id(patient_id)
         if not patient:
             return None
-        if data.get('patient_name'):
+        if 'patient_name' in data:
             patient.patient_name=data["patient_name"]
-        if data.get('age'):
+        if 'age' in data:
             patient.age=data["age"]
-        if data.get('gender'):
+        if 'gender' in data:
             patient.gender=data["gender"]
-        if data.get('disease'):
+        if 'disease' in data:
             patient.disease=data["disease"]
         db.session.commit()
         return patient

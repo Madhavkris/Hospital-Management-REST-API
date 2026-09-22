@@ -67,7 +67,7 @@ def add_appointment():
 def remove_appointment(appointment_id):
     appointment=get_appointment_by_id(appointment_id)
     if not appointment:
-        return jsonify({"error":"Appointment is not found"}),400
+        return jsonify({"error":"Appointment is not found"}),404
     deleted_appointment=delete_appointment(appointment_id)
     if not deleted_appointment:
         return jsonify({"error":"Appointment is not deleted"}),400

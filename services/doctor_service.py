@@ -52,11 +52,11 @@ def partial_update(doctor_id,data):
         doctor=get_doctor_by_id(doctor_id)
         if not doctor:
             return None
-        if data.get('doctor_name'):
+        if 'doctor_name' in data:
             doctor.doctor_name=data.get('doctor_name')
-        if data.get('specialization'):
+        if 'specialization'  in data:
             doctor.specialization=data.get('specialization')
-        if data.get('department_id'):
+        if 'department_id'  in data:
             doctor.department_id=data.get('department_id')
         db.session.commit()
         return doctor
