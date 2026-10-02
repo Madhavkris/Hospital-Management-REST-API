@@ -1,5 +1,6 @@
 from flask import Blueprint,jsonify,request
 from services.doctor_service import get_all_doctors,get_doctor_by_id,create_doctor,delete_doctor,update_doctor,partial_update
+from utils.doctor_valdation import validation_data
 doctor_bp=Blueprint('doctor',__name__,url_prefix='/api/doctors')
 #GET ALL
 @doctor_bp.route('/',methods=['GET'])
@@ -34,10 +35,13 @@ def add_doctor():
     new_doctor=request.get_json()
     if new_doctor is None:
         return jsonify({"error":"Doctor is not added"}),400
+    cleaned_data,error=validation_data(new_doctor,partial=False)
+    if error:
+        return jsonify({"error":error}),400
     created_doctor=create_doctor(
-        doctor_name=new_doctor.get("doctor_name"),
-        specialization=new_doctor.get("specialization"),
-        department_id=new_doctor.get("department_id")
+        doctor_name=cleaned_data["doctor_name"],
+        specialization=cleaned_data["specialization"],
+        department_id=cleaned_data["department_id"]
     )
     if created_doctor is None:
         return jsonify({"error":"Doctor is not created"}),400
@@ -65,17 +69,17 @@ def edit_doctor(doctor_id):
     doctor=request.get_json()
     if doctor is None:
         return jsonify({"error":"Request body is required"}),400
-    updated_doctor_name=doctor.get('doctor_name')
-    updated_specialization=doctor.get('specialization')
-    updated_department=doctor.get("department_id")
+    cleaned_data,error=validation_data(doctor,partial=False)
+    if error:
+        return jsonify({"error":error}),400
     updated=update_doctor(
         doctor_id=doctor_id,
-        doctor_name=updated_doctor_name,
-        specialization=updated_specialization,
-        department_id=updated_department
+        doctor_name=cleaned_data['doctor_name'],
+        specialization=cleaned_data['specialization'],
+        department_id=cleaned_data['department_id'],
     )
     if updated is None:
-        return jsonify({"error":"Doctor not updated"}),400
+        return jsonify({"error":"Doctor not found"}),404
     return jsonify({"status":"Doctor updated successfully"}),200
 #PARTISL UPDATED
 @doctor_bp.route('/<int:doctor_id>',methods=['PATCH'])
@@ -83,7 +87,10 @@ def partial_update_doctor(doctor_id):
     data=request.get_json()
     if not data:
         return jsonify({"error":"Request body is required"}),400
-    doctor=partial_update(doctor_id,data)
+    cleaned_data,error=validation_data(data,partial=True)
+    if error:
+        return jsonify({"error":error}),400
+    doctor=partial_update(doctor_id,cleaned_data)
     if doctor is None:
         return jsonify({"error":f"Doctor with ID {doctor_id} not found"}),404
     return jsonify({"status":"Doctor updated successfully"}),200

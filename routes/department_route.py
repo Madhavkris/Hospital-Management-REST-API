@@ -1,5 +1,6 @@
 from flask import Blueprint,jsonify,request
 from services.department_service import get_all_departments,get_department_by_id,create_department,update_department,partial_update
+from utils.department_validation import validation_data
 department_bp=Blueprint('department',__name__,url_prefix='/api/departments')
 @department_bp.route('/',methods=['GET'])
 def get_departments():
@@ -29,10 +30,13 @@ def add_department():
     new_department=request.get_json()
     if not new_department:
         return jsonify({"error":"Department not created"}),400
-    created_department=create_department(department_name=new_department.get('department_name'))
+    cleaned_data,errors=validation_data(new_department,partial=False)
+    if errors:
+        return jsonify({"error":errors}),400
+    created_department=create_department(department_name=cleaned_data['department_name'])
 
     if not created_department:
-        return jsonify({"error":"Department not created"}),400
+        return jsonify({"error":"Department not  be created"}),400
     return jsonify({
         "status":"Department created",
         "department_name":created_department.department_name,}),201
@@ -44,10 +48,12 @@ def edit_department(department_id):
     department=request.get_json()
     if not department:
         return jsonify({"Error":"Request body is required"}),400
-    update_department_name=department.get('department_name')
+    cleaned_data,errors=validation_data(department,partial=False)
+    if errors:
+        return jsonify({"error":errors}),400
     updated_department=update_department(
         department_id=department_id,
-        department_name=update_department_name
+        department_name=cleaned_data['department_name']
     )
     if not updated_department:
         return jsonify({"Error":"Department not found"}),404
@@ -58,7 +64,10 @@ def partial_update_department(department_id):
     data=request.get_json()
     if not data:
         return jsonify({"Error":"Request body is required"}),400
-    department=partial_update(department_id,data)
+    cleaned_data,errors=validation_data(data,partial=True)
+    if errors:
+        return jsonify({"error":errors}),400
+    department=partial_update(department_id,cleaned_data)
     if not department:
         return jsonify({"Error":"Department not found"}),404
     return jsonify({"status":"Department Partial Updated successfully"}),200
