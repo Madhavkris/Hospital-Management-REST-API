@@ -5,12 +5,22 @@ patient_bp=Blueprint('patient',__name__,url_prefix='/api/patients')
 #GET ALL
 @patient_bp.route('/',methods=['GET'])
 def get_patients():
-    patients,error=get_all_patients()
+    gender = request.args.get("gender")
+    age=request.args.get("age")
+    disease=request.args.get("disease")
+    parsed_age=age
+    if age is not None:
+        try:
+            parsed_age = int(age)
+        except ValueError:
+            return jsonify({"error": "Age must be an integer"}), 400
+    patients,error=get_all_patients(gender=gender,age=parsed_age,disease=disease)
+
     result=[]
     if error:
         return jsonify({"error":"Internal Server Error"}),500
     if patients is None:
-        return jsonify({"error":"Internal Server Error"}),500
+        return jsonify({"error": "Internal Server Error"}), 500
     for patient in patients:
         result.append({
             "patient_id":patient.patient_id,

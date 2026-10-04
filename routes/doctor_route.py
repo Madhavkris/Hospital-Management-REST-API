@@ -1,12 +1,19 @@
 from flask import Blueprint,jsonify,request
 from services.doctor_service import get_all_doctors,get_doctor_by_id,create_doctor,delete_doctor,update_doctor,partial_update
-from utils.doctor_valdation import validation_data
+from utils.doctor_validation import validation_data
 doctor_bp=Blueprint('doctor',__name__,url_prefix='/api/doctors')
 #GET ALL
 @doctor_bp.route('/',methods=['GET'])
 def get_doctors():
+    department_id=request.args.get("department_id")
+    specialization=request.args.get("specialization")
+    if department_id is not None:
+        try:
+            parsed_department_id = int(department_id)
+        except ValueError:
+            return jsonify({"Error":"Department ID must be an INTEGER"}),400
     #error handling
-    doctors,error=get_all_doctors()
+    doctors,error=get_all_doctors(department_id=department_id,specialization=specialization)
     if error:
         return jsonify({"error":"Internal Server Error"}),500
     if doctors is None:
@@ -19,7 +26,7 @@ def get_doctors():
             "specialization":doctor.specialization,
             "department":doctor.department.department_name
         })
-    return jsonify(result),200
+    return jsonify({"Message":"Doctor Data Retrived successfully","doctors":result}),200
 #GET BY ID
 @doctor_bp.route('/<int:doctor_id>',methods=['GET'])
 def get_doctor_with_id(doctor_id):

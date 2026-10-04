@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint,jsonify,request
 from services.appointment_service import get_appointment_by_id,get_all_appointments,create_appointments,delete_appointment,update_appointments,partial_update
 from utils.appointment_validation import validation_data
@@ -6,7 +8,33 @@ appointment_bp=Blueprint('appointment',__name__,url_prefix="/api/appointments")
 #READ ALL/GET ALL
 @appointment_bp.route('/',methods=['GET'])
 def all_appointments():
-        appointments,error=get_all_appointments()
+    #query parameters
+        doctor_id=request.args.get('doctor_id')
+        patient_id=request.args.get('patient_id')
+        status=request.args.get('status')
+        appointment_date=request.args.get('appointment_date')
+
+        parsed_patient_id=patient_id
+        parsed_doctor_id=doctor_id
+        parsed_appointment_date=appointment_date
+        if doctor_id is not None:
+            try:
+                parsed_doctor_id=int(doctor_id)
+            except ValueError:
+                return jsonify({"Error":"Doctor ID must be INTEGER"}),400
+        if patient_id is not None:
+            try:
+                parsed_patient_id=int(patient_id)
+            except ValueError:
+                return jsonify({"Error":"Patient ID must be INTEGER"}),400
+        if appointment_date is not None:
+            try:
+                parsed_appointment_date=datetime.strptime(appointment_date,"%Y-%m-%d").date()
+            except ValueError:
+                return jsonify({"Error":"Appointment date must be YYYY-MM-DD"}),400
+
+
+        appointments,error=get_all_appointments(patient_id=parsed_patient_id,doctor_id=parsed_doctor_id,appointment_date=parsed_appointment_date,status=status)
         if error:
             return jsonify({"error":"Internal Server Error"}),500
         if  not appointments:

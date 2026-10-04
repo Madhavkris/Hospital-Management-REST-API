@@ -7,10 +7,15 @@ def get_department_by_id(department_id):
    except Exception as e:
        print(e)
        return None,"Database Error"
-def get_all_departments():
+def get_all_departments(department_id=None,department_name=None):
     try:
-       check_dep= db.session.execute(db.select(Department)).scalars().all()
-       return check_dep,None
+        query = db.select(Department)
+        if department_id is not None:
+            query = query.where(Department.department_id == department_id)
+        if department_name is not None:
+            query = query.where(Department.department_name == department_name)
+        check_dep= db.session.execute(query).scalars().all()
+        return check_dep,None
     except Exception as e:
         print(e)
         return None,"Database Error"

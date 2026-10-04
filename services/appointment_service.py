@@ -11,9 +11,19 @@ def get_appointment_by_id(appointment_id):
       return None,"Database Error"
 
 #get all appointments
-def get_all_appointments():
+def get_all_appointments(patient_id=None,doctor_id=None,appointment_date=None,status=None):
+    #query parameter
     try:
-        check=db.session.execute(db.select(Appointment)).scalars().all()
+        query = db.select(Appointment)
+        if patient_id is not None:
+            query=query.where(Appointment.patient_id==patient_id)
+        if doctor_id is not None:
+            query=query.where(Appointment.doctor_id==doctor_id)
+        if appointment_date is not None:
+            query=query.where(Appointment.appointment_date==appointment_date)
+        if status is not None:
+            query=query.where(Appointment.status==status)
+        check=db.session.execute(query).scalars().all()
         return check,None
     except Exception as e:
         print(e)

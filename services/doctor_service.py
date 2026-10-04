@@ -1,9 +1,15 @@
 from database.connection import db
 from models.doctor_model import Doctor
-def get_all_doctors():
+def get_all_doctors(department_id=None,specialization=None):
     try:
-      check_doctor= db.session.execute(db.select(Doctor)).scalars().all()
-      return check_doctor,None
+        query = db.select(Doctor)
+        parsed_department_id=None
+        if department_id is not None:
+                query=query.where(Doctor.department_id==department_id)
+        if specialization:
+            query=query.where(Doctor.specialization==specialization)
+        check_doctor= db.session.execute(query).scalars().all()
+        return check_doctor,None
     except Exception as e:
         print(e)
         return None,"Database Error"

@@ -1,10 +1,18 @@
 from database.connection import db
 from models.patient_model import Patient
 #GET ALL
-def get_all_patients():
+def get_all_patients(gender=None,age=None,disease=None):
     try:
-        check_patient=db.session.execute(db.select(Patient)).scalars().all()
-        return check_patient,None
+        query=db.select(Patient)
+        if age is not None:
+            query = query.where(Patient.age==age)
+        if gender:
+            query = query.where(Patient.gender == gender)
+        if disease:
+            query=query.where(Patient.disease==disease)
+        #create a sqlalchemy query
+        patients=db.session.execute(query).scalars().all()
+        return patients,None
     except Exception as e:
         print(e)
         return None,"Database error"

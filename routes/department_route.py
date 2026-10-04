@@ -4,18 +4,25 @@ from utils.department_validation import validation_data
 department_bp=Blueprint('department',__name__,url_prefix='/api/departments')
 @department_bp.route('/',methods=['GET'])
 def get_departments():
-    departments,error=get_all_departments()
+    department_id=request.args.get('department_id')
+    department_name=request.args.get('department_name')
+    parsed_department_id=department_id
+    if department_id is not None:
+        try:
+            parsed_department_id=int(department_id)
+        except ValueError:
+            return jsonify({"Error":"Department ID must be an INTEGER"}),400
+    #error handling
+    departments,error=get_all_departments(department_id=parsed_department_id,department_name=department_name)
     if error:
         return jsonify({"error":"Internal Server Error"}),500
-    if departments is None:
-        return jsonify([]),200
     result=[]
     for department in departments:
         result.append({
             "department_id":department.department_id,
             "department_name":department.department_name,
             "doctors":[ doctor.doctor_name for doctor in department.doctors ]        })
-    return jsonify(result),200
+    return jsonify({"res":result}),200
 
 @department_bp.route('/<int:department_id>',methods=['GET'])
 def get_department_with_id(department_id):
