@@ -1,10 +1,23 @@
 from database.connection import db
 from models.patient_model import Patient
+#GET ALL
 def get_all_patients():
-    return db.session.execute(db.select(Patient)).scalars().all()
+    try:
+        check_patient=db.session.execute(db.select(Patient)).scalars().all()
+        return check_patient,None
+    except Exception as e:
+        print(e)
+        return None,"Database error"
+#GET BY ID
 def get_patient_by_id(patient_id):
-    patient=db.session.get(Patient,patient_id)
-    return patient
+    try:
+        patient=db.session.get(Patient,patient_id)
+        if patient is None:
+            return None,None
+        return patient,None
+    except Exception as e:
+        print(e)
+        return None,"Database error"
 #create patients
 def create_patient(patient_nm,age,gender,disease):
     try:
@@ -16,44 +29,53 @@ def create_patient(patient_nm,age,gender,disease):
         )
         db.session.add(new_patient)
         db.session.commit()
-        return new_patient
+        return new_patient,None
     except Exception as e:
         db.session.rollback()
         print(e)
-        return None
+        return None,"Database error"
 
-
+#DELETE
 def delete_patient(patient_id):
     try:
-       patient=get_patient_by_id(int(patient_id))
+       patient,error=get_patient_by_id(int(patient_id))
+       if error:
+           return None,error
+       if  patient is None:
+           return None,None
        db.session.delete(patient)
        db.session.commit()
-       return patient
+       return patient,None
     except Exception as e:
         db.session.rollback()
         print(repr(e))
-        return None
-
+        return None,"Database error"
+#PUT/UPDATE
 def update_patient(patient_id,patient_name,age,gender,disease):
     try:
-        patient=get_patient_by_id(patient_id)
-        if not patient:
-            return None
+        patient,error=get_patient_by_id(patient_id)
+        if error:
+            return None,error
+        if  patient is None:
+            return None,None
         patient.patient_name=patient_name
         patient.age=age
         patient.gender=gender
         patient.disease=disease
         db.session.commit()
-        return patient
+        return patient,None
     except Exception as e:
         db.session.rollback()
         print(repr(e))
-        return None
+        return None,"Database error"
+#PATCH ?PARTIAL UPDATE
 def partial_update(patient_id,data):
     try:
-        patient=get_patient_by_id(patient_id)
-        if not patient:
-            return None
+        patient,error=get_patient_by_id(patient_id)
+        if error:
+            return None,error
+        if  patient is None:
+            return None,None
         if 'patient_name' in data:
             patient.patient_name=data["patient_name"]
         if 'age' in data:
@@ -63,8 +85,8 @@ def partial_update(patient_id,data):
         if 'disease' in data:
             patient.disease=data["disease"]
         db.session.commit()
-        return patient
+        return patient,None
     except Exception as e:
         db.session.rollback()
         print(repr(e))
-        return None
+        return None,"Database error"

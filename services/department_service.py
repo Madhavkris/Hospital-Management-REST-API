@@ -1,11 +1,19 @@
 from database.connection import db
 from models.department_model import Department
 def get_department_by_id(department_id):
-    department=db.session.get(Department,department_id)
-    return department
+   try:
+       department=db.session.get(Department,department_id)
+       return department,None
+   except Exception as e:
+       print(e)
+       return None,"Database Error"
 def get_all_departments():
-    return db.session.execute(db.select(Department)).scalars().all()
-
+    try:
+       check_dep= db.session.execute(db.select(Department)).scalars().all()
+       return check_dep,None
+    except Exception as e:
+        print(e)
+        return None,"Database Error"
 #
 def create_department(department_name):
     try:
@@ -14,38 +22,42 @@ def create_department(department_name):
         )
         db.session.add(new_department)
         db.session.commit()
-        return new_department
+        return new_department,None
     except Exception as e:
         db.session.rollback()
         print(e)
-        return None
+        return None,"Database Error"
 
 #update
 def update_department(department_id, department_name):
     try:
-        department=get_department_by_id(department_id)
-        if not department:
-            return None
+        department,error=get_department_by_id(department_id)
+        if error:
+            return None,error
+        if  department is None:
+            return None,None
         department.department_name=department_name
         db.session.commit()
-        return department
+        return department,None
     except Exception as e:
         db.session.rollback()
         print(repr(e))
-        return None
+        return None,"Database Error"
 
 #Partial Update
 def partial_update(department_id,data):
     try:
-       department=get_department_by_id(department_id)
-       if not department:
-           return None
+       department,error=get_department_by_id(department_id)
+       if error:
+           return None,error
+       if  department is None:
+           return None,None
        if 'department_name' in data:
            department.department_name=data.get('department_name')
        db.session.commit()
-       return department
+       return department,None
     except Exception as e:
         db.session.rollback()
         print(repr(e))
-        return None
+        return None,"Database Error"
 
