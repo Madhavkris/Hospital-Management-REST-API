@@ -6,8 +6,9 @@ appointment_bp=Blueprint('appointment',__name__,url_prefix="/api/appointments")
 #READ ALL/GET ALL
 @appointment_bp.route('/',methods=['GET'])
 def all_appointments():
-        appointments=get_all_appointments()
-
+        appointments,error=get_all_appointments()
+        if error:
+            return jsonify({"error":"Internal Server Error"}),500
         if  not appointments:
             return jsonify([]),200
         result=[]
@@ -29,7 +30,9 @@ def all_appointments():
 @appointment_bp.route('/<int:appointment_id>',methods=['GET'])
 def get_appointment(appointment_id):
     try:
-        appointment=get_appointment_by_id(appointment_id)
+        appointment,error=get_appointment_by_id(appointment_id)
+        if error:
+            return jsonify({"error":"Internal Server Error"}),500
         if appointment is None:
             return jsonify({'error':'Appointment not found'}),404
         return jsonify({
@@ -55,26 +58,32 @@ def add_appointment():
     cleaned_data,errors=validation_data(new_appointment,partial=False)
     if errors:
         return jsonify({"error":errors}),400
-    created_appointment=create_appointments(
+    created_appointment,error=create_appointments(
       patient_id=cleaned_data['patient_id'],
       doctor_id=cleaned_data['doctor_id'],
       appointment_date=cleaned_data['appointment_date'],
       appointment_time=cleaned_data['appointment_time'],
       status=cleaned_data['status']
     )
+    if error:
+        return jsonify({"error":"Internal Server Error"}),500
     if created_appointment is None:
-        return jsonify({"error":"Appointment is not created"}),400
+        return jsonify({"error":"Appointment is not created"}),500
     return jsonify({"message":"Appointment created successfully",
                     "appointment_id":created_appointment.appointment_id}),201
 #delete
 @appointment_bp.route('/<int:appointment_id>',methods=['DELETE'])
 def remove_appointment(appointment_id):
-    appointment=get_appointment_by_id(appointment_id)
-    if not appointment:
+    appointment,error=get_appointment_by_id(appointment_id)
+    if error:
+        return jsonify({"error":"Internal Server Error"}),500
+    if  appointment is None:
         return jsonify({"error":"Appointment is not found"}),404
-    deleted_appointment=delete_appointment(appointment_id)
-    if not deleted_appointment:
-        return jsonify({"error":"Appointment is not deleted"}),400
+    deleted_appointment,error=delete_appointment(appointment_id)
+    if error:
+        return jsonify({"error":"Internal Server Error"}),500
+    if  deleted_appointment is None:
+        return jsonify({"error":"Appointment is not deleted"}),404
     return jsonify({"message":"Appointment deleted successfully","appointment ID":deleted_appointment.appointment_id}),200
 
 #UPDATE(PUT)
@@ -83,11 +92,11 @@ def edit_appointments(appointment_id):
     appointment=request.get_json()
     if not appointment:
         return jsonify({"Error":"Request Body is required"}),400
-    cleaned_data,errors=validation_data(appointment,partial=False)
-    if errors:
-        return jsonify({"error":errors}),400
+    cleaned_data,error=validation_data(appointment,partial=False)
+    if error:
+        return jsonify({"error":error}),400
 
-    updated_appointment=update_appointments(
+    updated_appointment,error=update_appointments(
         appointment_id=appointment_id,
         doctor_id=cleaned_data["doctor_id"],
         patient_id=cleaned_data["patient_id"],
@@ -95,7 +104,9 @@ def edit_appointments(appointment_id):
         appointment_date=cleaned_data["appointment_date"],
         status=cleaned_data['status']
     )
-    if not updated_appointment:
+    if error:
+        return jsonify({"error":"Internal Server Error"}),500
+    if  updated_appointment is None:
         return jsonify({"error":"Appointment is not updated"}),404
     return jsonify({"status":"Appointment is updated"}),200
 
@@ -105,10 +116,12 @@ def partial_update_appointment(appointment_id):
     data=request.get_json()
     if not data:
         return jsonify({"error":"Request Body is required"}),400
-    cleaned_data,errors=validation_data(data,partial=True)
-    if errors:
-        return jsonify({"error":errors}),400
-    appointment=partial_update(appointment_id,cleaned_data)
-    if not appointment:
+    cleaned_data,error=validation_data(data,partial=True)
+    if error:
+        return jsonify({"error":error}),400
+    appointment,error=partial_update(appointment_id,cleaned_data)
+    if error:
+        return jsonify({"error":"Internal Server Error"}),500
+    if  appointment is None:
         return jsonify({"error":"Appointment is not updated"}),404
     return jsonify({"message":"Appointment updated successfully"}),200
