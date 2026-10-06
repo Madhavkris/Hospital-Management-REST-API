@@ -7,13 +7,32 @@ def get_departments():
     department_id=request.args.get('department_id')
     department_name=request.args.get('department_name')
     parsed_department_id=department_id
+    #pagination
+    page=request.args.get('page')
+    per_page=request.args.get('per_page')
+    parsed_page=1
+    parsed_per_page=10
+    if page is not None:
+        try:
+            parsed_page=int(page)
+            if parsed_page<1:
+                return ValueError
+        except ValueError:
+            return jsonify({"error":"Page must be an greater than 1"})
+    if per_page is not None:
+        try:
+            parsed_per_page=int(per_page)
+            if not (1<=parsed_per_page<=100):
+                raise ValueError
+        except ValueError:
+            return jsonify({"error":" Per Page must be an greater than 1"}),400
     if department_id is not None:
         try:
             parsed_department_id=int(department_id)
         except ValueError:
             return jsonify({"Error":"Department ID must be an INTEGER"}),400
     #error handling
-    departments,error=get_all_departments(department_id=parsed_department_id,department_name=department_name)
+    departments,error=get_all_departments(department_id=parsed_department_id,department_name=department_name,page=parsed_page,per_page=parsed_per_page)
     if error:
         return jsonify({"error":"Internal Server Error"}),500
     result=[]

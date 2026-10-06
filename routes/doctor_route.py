@@ -7,13 +7,34 @@ doctor_bp=Blueprint('doctor',__name__,url_prefix='/api/doctors')
 def get_doctors():
     department_id=request.args.get("department_id")
     specialization=request.args.get("specialization")
+    #pagination
+    page=request.args.get("page")
+    per_page=request.args.get("per_page")
+    parsed_page=1
+    parsed_per_page=10
+    if per_page is not None:
+        try:
+            parsed_per_page=int(per_page)
+            if not (1<=parsed_per_page<=100):
+                raise ValueError
+        except ValueError:
+            return jsonify({"error":"per_page must be between 1 and 100"}),400
+    if page is not None:
+        try:
+            parsed_page=int(page)
+            if  parsed_page<1:
+                return ValueError
+        except ValueError:
+            return jsonify({"error":"page must be between 1 and 100"}),400
+    #validation
+
     if department_id is not None:
         try:
             parsed_department_id = int(department_id)
         except ValueError:
             return jsonify({"Error":"Department ID must be an INTEGER"}),400
     #error handling
-    doctors,error=get_all_doctors(department_id=department_id,specialization=specialization)
+    doctors,error=get_all_doctors(department_id=department_id,specialization=specialization,page=parsed_page,per_page=parsed_per_page)
     if error:
         return jsonify({"error":"Internal Server Error"}),500
     if doctors is None:

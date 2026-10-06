@@ -1,6 +1,6 @@
 from database.connection import db
 from models.doctor_model import Doctor
-def get_all_doctors(department_id=None,specialization=None):
+def get_all_doctors(department_id=None,specialization=None,page=None,per_page=None):
     try:
         query = db.select(Doctor)
         parsed_department_id=None
@@ -8,6 +8,11 @@ def get_all_doctors(department_id=None,specialization=None):
                 query=query.where(Doctor.department_id==department_id)
         if specialization:
             query=query.where(Doctor.specialization==specialization)
+        #pagination
+        if page is not None and per_page is not None:
+            offset=(page-1)*per_page
+            query=query.limit(per_page).offset(offset)
+
         check_doctor= db.session.execute(query).scalars().all()
         return check_doctor,None
     except Exception as e:

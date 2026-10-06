@@ -17,6 +17,25 @@ def all_appointments():
         parsed_patient_id=patient_id
         parsed_doctor_id=doctor_id
         parsed_appointment_date=appointment_date
+        # pagination
+        page = request.args.get('page')
+        per_page = request.args.get('per_page')
+        parsed_page = 1
+        parsed_per_page = 10
+        if page is not None:
+            try:
+                parsed_page = int(page)
+                if parsed_page < 1:
+                    return ValueError
+            except ValueError:
+                return jsonify({"error": "Page must be an greater than 1"}),400
+        if per_page is not None:
+            try:
+                parsed_per_page = int(per_page)
+                if not (1 <= parsed_per_page <= 100):
+                    raise ValueError
+            except ValueError:
+                return jsonify({"error": " Per Page must be an integer between 1 and 100"}),400
         if doctor_id is not None:
             try:
                 parsed_doctor_id=int(doctor_id)
@@ -32,9 +51,7 @@ def all_appointments():
                 parsed_appointment_date=datetime.strptime(appointment_date,"%Y-%m-%d").date()
             except ValueError:
                 return jsonify({"Error":"Appointment date must be YYYY-MM-DD"}),400
-
-
-        appointments,error=get_all_appointments(patient_id=parsed_patient_id,doctor_id=parsed_doctor_id,appointment_date=parsed_appointment_date,status=status)
+        appointments,error=get_all_appointments(patient_id=parsed_patient_id,doctor_id=parsed_doctor_id,appointment_date=parsed_appointment_date,status=status,page=parsed_page,per_page=parsed_per_page)
         if error:
             return jsonify({"error":"Internal Server Error"}),500
         if  not appointments:

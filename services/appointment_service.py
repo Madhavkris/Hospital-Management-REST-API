@@ -11,7 +11,7 @@ def get_appointment_by_id(appointment_id):
       return None,"Database Error"
 
 #get all appointments
-def get_all_appointments(patient_id=None,doctor_id=None,appointment_date=None,status=None):
+def get_all_appointments(patient_id=None,doctor_id=None,appointment_date=None,status=None,page=None,per_page=None):
     #query parameter
     try:
         query = db.select(Appointment)
@@ -23,6 +23,10 @@ def get_all_appointments(patient_id=None,doctor_id=None,appointment_date=None,st
             query=query.where(Appointment.appointment_date==appointment_date)
         if status is not None:
             query=query.where(Appointment.status==status)
+        #pagination
+        if page is not None and per_page is not None:
+            offset = (page-1)*per_page
+            query=query.limit(per_page).offset(offset)
         check=db.session.execute(query).scalars().all()
         return check,None
     except Exception as e:

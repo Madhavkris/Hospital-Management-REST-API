@@ -1,7 +1,7 @@
 from database.connection import db
 from models.patient_model import Patient
 #GET ALL
-def get_all_patients(gender=None,age=None,disease=None):
+def get_all_patients(gender=None,age=None,disease=None,page=None,per_page=None):
     try:
         query=db.select(Patient)
         if age is not None:
@@ -10,6 +10,9 @@ def get_all_patients(gender=None,age=None,disease=None):
             query = query.where(Patient.gender == gender)
         if disease:
             query=query.where(Patient.disease==disease)
+        if page is not None and per_page is not None:
+            offset = (page-1)*per_page
+            query=query.limit(per_page).offset(offset)
         #create a sqlalchemy query
         patients=db.session.execute(query).scalars().all()
         return patients,None

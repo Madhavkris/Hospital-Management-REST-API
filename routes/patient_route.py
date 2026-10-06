@@ -9,12 +9,34 @@ def get_patients():
     age=request.args.get("age")
     disease=request.args.get("disease")
     parsed_age=age
+    #pagination
+    page=request.args.get("page")
+    per_page=request.args.get("per_page")
+    #default values
+    parsed_page=1
+    parsed_per_page=10
+    #parse and  page validation
+    if page is not None:
+        try:
+            parsed_page=int(page)
+            if parsed_page<1:
+                raise ValueError
+        except ValueError:
+            return jsonify({'message':'Invalid page.Must be an Integer >=1'}),400
+    if per_page is not None:
+        try:
+            parsed_per_page=int(per_page)
+            if not (1<=parsed_per_page<=100):
+                raise ValueError
+        except ValueError:
+            return jsonify({'message':'Invalid per_page.Must be an Integer>=1'}),400
+
     if age is not None:
         try:
             parsed_age = int(age)
         except ValueError:
             return jsonify({"error": "Age must be an integer"}), 400
-    patients,error=get_all_patients(gender=gender,age=parsed_age,disease=disease)
+    patients,error=get_all_patients(gender=gender,age=parsed_age,disease=disease,page=parsed_page,per_page=parsed_per_page)
 
     result=[]
     if error:

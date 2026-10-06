@@ -7,13 +7,18 @@ def get_department_by_id(department_id):
    except Exception as e:
        print(e)
        return None,"Database Error"
-def get_all_departments(department_id=None,department_name=None):
+def get_all_departments(department_id=None,department_name=None,page=None,per_page=None):
     try:
         query = db.select(Department)
         if department_id is not None:
             query = query.where(Department.department_id == department_id)
         if department_name is not None:
             query = query.where(Department.department_name == department_name)
+        #pagination
+        if page is not None and per_page is not None:
+            offset=(page-1)*per_page
+            query=query.limit(per_page).offset(offset)
+
         check_dep= db.session.execute(query).scalars().all()
         return check_dep,None
     except Exception as e:
