@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify,request
 from services.department_service import get_all_departments,get_department_by_id,create_department,update_department,partial_update
 from utils.department_validation import validation_data
+from utils.serializers import serialize_department
 department_bp=Blueprint('department',__name__,url_prefix='/api/departments')
 @department_bp.route('/',methods=['GET'])
 def get_departments():
@@ -35,12 +36,7 @@ def get_departments():
     departments,error=get_all_departments(department_id=parsed_department_id,department_name=department_name,page=parsed_page,per_page=parsed_per_page)
     if error:
         return jsonify({"error":"Internal Server Error"}),500
-    result=[]
-    for department in departments:
-        result.append({
-            "department_id":department.department_id,
-            "department_name":department.department_name,
-            "doctors":[ doctor.doctor_name for doctor in department.doctors ]        })
+    result=[serialize_department(department) for department in departments]
     return jsonify({"res":result}),200
 
 @department_bp.route('/<int:department_id>',methods=['GET'])

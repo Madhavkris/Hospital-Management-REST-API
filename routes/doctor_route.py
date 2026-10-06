@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify,request
 from services.doctor_service import get_all_doctors,get_doctor_by_id,create_doctor,delete_doctor,update_doctor,partial_update
 from utils.doctor_validation import validation_data
+from utils.serializers import serialize_doctor
 doctor_bp=Blueprint('doctor',__name__,url_prefix='/api/doctors')
 #GET ALL
 @doctor_bp.route('/',methods=['GET'])
@@ -39,14 +40,7 @@ def get_doctors():
         return jsonify({"error":"Internal Server Error"}),500
     if doctors is None:
         return jsonify({"error":"Database error"}),500
-    result=[]
-    for doctor in doctors:
-        result.append({
-            "doctor_id":doctor.doctor_id,
-            "doctor_name":doctor.doctor_name,
-            "specialization":doctor.specialization,
-            "department":doctor.department.department_name
-        })
+    result=[serialize_doctor(doctor) for doctor in doctors]
     return jsonify({"Message":"Doctor Data Retrived successfully","doctors":result}),200
 #GET BY ID
 @doctor_bp.route('/<int:doctor_id>',methods=['GET'])

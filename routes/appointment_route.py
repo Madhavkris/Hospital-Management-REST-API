@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint,jsonify,request
 from services.appointment_service import get_appointment_by_id,get_all_appointments,create_appointments,delete_appointment,update_appointments,partial_update
 from utils.appointment_validation import validation_data
-
+from utils.serializers import serialize_appointment
 appointment_bp=Blueprint('appointment',__name__,url_prefix="/api/appointments")
 #READ ALL/GET ALL
 @appointment_bp.route('/',methods=['GET'])
@@ -56,18 +56,7 @@ def all_appointments():
             return jsonify({"error":"Internal Server Error"}),500
         if  not appointments:
             return jsonify([]),200
-        result=[]
-        for appointment in appointments:
-            result.append({
-                "appointment_id": appointment.appointment_id,
-                "patient_name": appointment.patient.patient_name,
-                "doctor_name": appointment.doctor.doctor_name,
-                "specialization": appointment.doctor.specialization,
-                "department_name": appointment.doctor.department.department_name,
-                "appointment_date": str(appointment.appointment_date),
-                "appointment_time": str(appointment.appointment_time),
-                "status": appointment.status
-            })
+        result=[serialize_appointment(appointment) for appointment in appointments]
         return jsonify(result),200
 
 

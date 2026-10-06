@@ -1,6 +1,7 @@
 from flask import Blueprint,jsonify,request
 from services.patient_service import get_all_patients,get_patient_by_id,create_patient,delete_patient,update_patient,partial_update
 from utils.patient_validation import validation_data
+from utils.serializers import serialize_patient
 patient_bp=Blueprint('patient',__name__,url_prefix='/api/patients')
 #GET ALL
 @patient_bp.route('/',methods=['GET'])
@@ -29,7 +30,7 @@ def get_patients():
             if not (1<=parsed_per_page<=100):
                 raise ValueError
         except ValueError:
-            return jsonify({'message':'Invalid per_page.Must be an Integer>=1'}),400
+            return jsonify({'message':'Invalid per_page.Must be an Integer between 1 and 100'}),400
 
     if age is not None:
         try:
@@ -37,20 +38,11 @@ def get_patients():
         except ValueError:
             return jsonify({"error": "Age must be an integer"}), 400
     patients,error=get_all_patients(gender=gender,age=parsed_age,disease=disease,page=parsed_page,per_page=parsed_per_page)
-
-    result=[]
     if error:
         return jsonify({"error":"Internal Server Error"}),500
     if patients is None:
         return jsonify({"error": "Internal Server Error"}), 500
-    for patient in patients:
-        result.append({
-            "patient_id":patient.patient_id,
-            "patient_name":patient.patient_name,
-            "age":patient.age,
-            "gender":patient.gender,
-            "disease":patient.disease
-        })
+    result = [serialize_patient(patient) for patient in patients]
     return jsonify({"message":"Patient data retrieved successfully","patients":result}),200
 #GET BY ID
 @patient_bp.route('/<int:patient_id>',methods=['GET'])
